@@ -1,0 +1,25 @@
+table {
+	border-collapse: collapse;
+}
+th, td {
+	border: 1px dotted black;
+	text-align: center;
+}
+td {
+	font-size: 20px;
+}
+table, div, button {
+	margin: 1rem 0;
+}
+#get-button {
+	background-color: #3c6cc7;
+	border-color: #ffffff;
+	display:  grid;
+	margin: auto;
+	font-size: 15px;
+	margin-bottom: 25px;
+}
+h1 {
+	text-align: center;
+	padding-top: 25px;
+}

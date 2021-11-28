@@ -3,7 +3,8 @@ const musicTable = document.getElementById("user-data");
 
 /* takes a DOM Node object as an argument
 will remove all of its child elements from the DOM
-without removing the containing element itself */
+without removing the containing element itself in case we wanted
+to remove it in future changes that we make */
 function removeChildren(element) {
     while (element.hasChildNodes()) {
         element.lastChild.remove();
@@ -38,7 +39,8 @@ function formatReleaseDate(release) {
     return `${month}/${day}/${year}`;
 }
 
-/* append given string when any content has a value of null, otherwise simply assign the content to the cell */
+/* append given string when any content has a value of null, otherwise 
+simply assign the content to the cell */
 function changeIfNull(cell, content) {
     if (content === null) {
         cell.textContent = "- -";
@@ -94,10 +96,10 @@ function appendTableBody(albums) {
     }
 }
 
-/* called after a button is pressed, mimicking a Fetch API call */
+/* called after a button is pressed, mimicking a Fetch API call; If I had more time, I would further integrate the MusicBrainz cover art API: https://musicbrainz.org/doc/MusicBrainz_API*/
 function getInfo() {
 
-    mockFetchHelper(true, musicData, 10)
+    mockFetchHelper(true, musicData, 1000)
         .then((response) => {
             removeChildren(musicTable);
             appendTableBody(musicData.albums);
@@ -110,9 +112,9 @@ function getInfo() {
 submitButton.addEventListener("click", getInfo);
 
 
-// I had to move this mockFetchHelper here since Firefox gave me the run around with trying to get this imported at the "top-level", something about a CORS request
-// link to issue: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp
-// I also kept getting errors about "Uncaught SyntaxError: import declarations may only appear at top level of a module", no matter what I changed in my import statement.
+/* I had to move this mockFetchHelper here since Firefox gave me the run around 
+with trying to get this imported at the "top-level", something about a CORS request.
+link to issue: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSRequestNotHttp. I also kept getting errors about "Uncaught SyntaxError: import declarations may only appear at top level of a module", no matter what I changed in my import statement. */
 
 const musicData = {
   "albums": [

@@ -21,20 +21,30 @@ function convertTime(hours) {
     return hours - 12;
 }
 
-/* formats unix timestamp into provided format */
-function formatListenDate(listen) {
-    const date = new Date(listen);
+/* formats unix timestamp into directed format */
+function formatListenDate(unixTime) {
+    const date = new Date(unixTime);
     const formattedMonth = String(date.getMonth() + 1).padStart(2, '0');
     const formattedDate = String(date.getDate()).padStart(2, '0');
     const formattedMins = String(date.getMinutes()).padStart(2, '0');
     return `${formattedMonth}/${formattedDate}/${date.getFullYear()} ${convertTime(date.getHours())}:${formattedMins} ${date.getHours() < 12 ? "am" : "pm"}`;
 }
 
+/* reformat given release date into directed format */
 function formatReleaseDate(release) {
     const year = release.slice(0, 4);
     const month = release.slice(5, 7);
     const day = release.slice(8, 10);
     return `${month}/${day}/${year}`;
+}
+
+/* append given string when any content has a value of null, otherwise simply assign the content to the cell */
+function changeIfNull(cell, content) {
+    if (content === null) {
+        cell.textContent = "- -";
+    } else {
+        cell.textContent = content;
+    }
 }
 
 /* append all album info into a table from it being passed in from the mock API call */
@@ -47,30 +57,31 @@ function appendTableBody(albums) {
 
         const tr = document.createElement("tr");
         const albumTitleCell = document.createElement("td");
-        albumTitleCell.textContent = album.album_title;
+        changeIfNull(albumTitleCell, album.album_title);
 
         const ratingCell = document.createElement("td");
-        // provide alternative messaging if rating is unavailable
-        if (album.avg_user_rating == null) {
-            ratingCell.textContent = "- -"
-        } else {
-            ratingCell.textContent = album.avg_user_rating;
-        }
+        changeIfNull(ratingCell, album.avg_user_rating);
 
         const bandNameCell = document.createElement("td");
-        bandNameCell.textContent = album.band_name;
+        changeIfNull(bandNameCell, album.band_name);
 
         const genresCell = document.createElement("td");
-        genresCell.textContent = album.genres;
+        changeIfNull(genresCell, album.genres);
 
+        // since these two fields (last listened and release date) are formatted differently from how they're provided, we have to check if they're null first to know if they need to be passed into their respective formatting functions at all
         const lastListenedCell = document.createElement("td");
-        formattedListenDate = formatListenDate(album.last_listened);
-        lastListenedCell.textContent = formattedListenDate;
+        if (album.last_listened !== null) {
+            changeIfNull(lastListenedCell, formatListenDate(album.last_listened));
+        } else {
+            changeIfNull(lastListenedCell, album.last_listened);
+        }
 
         const releaseDateCell = document.createElement("td");
-        formattedReleaseDate = formatReleaseDate(album.release_date);
-        console.log(formattedReleaseDate);
-        releaseDateCell.textContent = formattedReleaseDate;
+        if (album.release_date !== null) {
+            changeIfNull(releaseDateCell, formatReleaseDate(album.release_date));
+        } else {
+            changeIfNull(releaseDateCell, album.release_date);
+        }
 
         tr.append(bandNameCell);
         tr.append(albumTitleCell);
@@ -89,7 +100,6 @@ function getInfo() {
     mockFetchHelper(true, musicData, 10)
         .then((response) => {
             removeChildren(musicTable);
-            console.log(musicData.albums);
             appendTableBody(musicData.albums);
         })
         .catch((error) => {
